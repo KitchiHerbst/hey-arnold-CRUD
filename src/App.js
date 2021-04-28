@@ -1,27 +1,46 @@
 import logo from "./logo.svg";
 import "./App.css";
 import CardData from "./CardData.js";
+import React from "react";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        {console.log("peachy")}
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends React.Component {
+  state = {
+    characters: []
+  }
+
+  componentDidMount(){
+
+    fetch('http://localhost:3001/characters')
+    .then(res => res.json())
+    .then(characterData => this.setState({characters: characterData}))
+  }
+
+
+  createCardData = () => {
+    return this.state.characters.map(character => {
+      return <CardData character={character} deleteButton={this.deleteCharacter}/>
+    })
+  }
+
+  deleteCharacter = (character) => {
+    fetch(`http://localhost:3001/characters/${character.id}`,{
+      method: 'DELETE'
+    })
+    this.setState({
+      characters: this.state.characters.filter((object)=>{ return object != character})
+    })
+  }
+
+
+
+  render(){
+    return (
+      <div className="app" id='App'>
+        {this.createCardData()}
+        
+      </div>
+    );
+  }
 }
 
 export default App;
